@@ -1,1 +1,81 @@
+//sensor and motor speed
+const int RIGHTSENSOR 11
+const int LEFTSENSOR 12
+const int MOTOR_SPEED 195
 
+//Right motor
+int RightMotor=6;
+int rMotorPin1=7;
+int rMotorPin2=8;
+
+//Left motor
+int LeftMotor=5;
+int lMotorPin1=9;
+int lMotorPin2=10;
+
+void setup()
+{
+  pinMode(RightMotor, OUTPUT);  //sets up motors for output and sensors as input
+  pinMode(rMotorPin1, OUTPUT);
+  pinMode(rMotorPin2, OUTPUT);
+  pinMode(LeftMotor, OUTPUT);
+  pinMode(lMotorPin1, OUTPUT);
+  pinMode(lMotorPin2, OUTPUT);
+  pinMode(RIGHTSENSOR, INPUT); //sets up sensors as input to read if black line is present
+  pinMode(LEFTSENSOR, INPUT);
+  rotateMotor(0,0);   
+}
+
+void rotateMotor(int rMotorSpeed, int lMotorSpeed)
+{
+  
+  if (rMotorSpeed < 0) //backwards
+  {
+    digitalWrite(rMotorPin1,LOW); 
+    digitalWrite(rMotorPin2,HIGH);    
+  }
+  else if (rMotorSpeed > 0) //forward
+  {
+    digitalWrite(rMotorPin1, HIGH);
+    digitalWrite(rMotorPin2,LOW);
+  }
+  else //no movement
+  { 
+    digitalWrite(rMotorPin1,LOW); 
+    digitalWrite(rMotorPin2,LOW);      
+  }
+
+  if (lMotorSpeed > 0) //forward
+  {
+    digitalWrite(lMotorPin2,LOW);
+    digitalWrite(lMotorPin1,HIGH);    
+  }
+  else if (lMotorSpeed < 0) //backwards
+  {
+    digitalWrite(lMotorPin2,HIGH); 
+    digitalWrite(lMotorPin1,LOW);      
+  }
+  else //no movement
+  {
+    digitalWrite(lMotorPin1,LOW);
+    digitalWrite(lMotorPin2,LOW);      
+  }
+  analogWrite(RightMotor, abs(rMotorSpeed));
+  analogWrite(LeftMotor, abs(lMotorSpeed));
+}
+
+
+void loop()
+{
+  int rightSensorValue = digitalRead(RIGHTSENSOR); //reads whether right sensor is high or low
+  int leftSensorValue = digitalRead(LEFTSENSOR); //reads whether the left sensor is high or low
+
+  if (rightSensorValue == LOW && leftSensorValue == LOW) //If no signal is recieved, go straight
+    rotateMotor(MOTOR_SPEED, MOTOR_SPEED); 
+  else if (rightSensorValue == LOW && leftSensorValue == HIGH) //If left side detects line, turn left
+      rotateMotor(MOTOR_SPEED, -MOTOR_SPEED);
+   else if (rightSensorValue == HIGH && leftSensorValue == LOW) //If right side detects line, turn right
+    rotateMotor(-MOTOR_SPEED, MOTOR_SPEED);
+  else 
+    rotateMotor(0, 0); //robot doesn't move but still can detect movement via loop
+}
